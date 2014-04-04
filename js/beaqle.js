@@ -359,7 +359,15 @@ function clientIsIE() {
                     max: TestData.RateMaxValue,
                     animate: false,
                     orientation: "horizontal"
+                    orientation: "vertical",
+                    disabled: true,
+                    slide: function( event, ui){
+                    rating = ui.value;
+                    sliderpos = +$(this).attr('position');
+                    var div = document.getElementById('sliderval'+sliderpos);
+					div.innerHTML = rating;
 					$(this).addClass('changed')
+					}
             });
                     
             $(this).slider('option', 'value', 0);
@@ -477,10 +485,12 @@ function clientIsIE() {
 
         // reset all buttons and sliders
         $('.rateSlider').parent().css('background-color', 'transparent');
+        $('.rateSlider').slider( "option", "disabled", true );
         $('.playButton').removeClass('playButton-active');
         
         // highlight active slider and button
         $(".rateSlider[rel="+id+"]").parent().css('background-color', '#D5E5F6');
+        $(".rateSlider[rel="+id+"]").slider( "option", "disabled", false );
         $(".playButton[rel="+id+"]").addClass('playButton-active');
         
         this.audioPool.play(id);
@@ -637,6 +647,7 @@ MushraTest.prototype.createTestDOM = function (TestIdx) {
         // add spacing
         row = tab.insertRow(-1);
         row.setAttribute("height","5"); 
+        row.setAttribute("height","50"); 
 
         var rateMin = this.TestData.RateMinValue;
         var rateMax = this.TestData.RateMaxValue;
@@ -647,6 +658,26 @@ MushraTest.prototype.createTestDOM = function (TestIdx) {
             var fileID = this.TestState.FileMappings[TestIdx][i];
             if (fileID === "Reference")
                 relID = "HiddenRef";
+            row[i]  = tab.insertRow(-1);           
+            if(i===0){
+            cell = row[i].insertCell(-1)
+            cell.colSpan = this.TestState.FileMappings[TestIdx].length;
+            cell.innerHTML = 'Please rate each separated audio clip for overall quality';
+            }
+            if(i===1){ 
+            for (var j = 0; j < this.TestState.FileMappings[TestIdx].length; j++){ 
+            var fileID;
+             if (fileID === "Reference")
+             	relID = fileID;
+            cell[j].innerHTML = '<button id="play'+relID+'Btn" class="playButton" rel="'+relID+'">'+(j+1)+'</button>';
+            this.addAudio(TestIdx, fileID, relID);
+            }
+            }
+            if (i===2){
+            for (var j = 0; j < this.TestState.FileMappings[TestIdx].length; j++) { 
+            var fileID = this.TestState.FileMappings[TestIdx][j];
+             if (fileID === "Reference")
+                 relID = "HiddenRef";
             else
                 relID = fileID;
 
@@ -660,7 +691,12 @@ MushraTest.prototype.createTestDOM = function (TestIdx) {
             cell[3] = row[i].insertCell(-1);
             var fileIDstr = "";
             if (this.TestData.ShowFileIDs) {
+                 relID = fileID;
+        	var fileIDstr = "";
+                if (this.TestData.ShowFileIDs) {
                     fileIDstr = fileID;
+                    if (fileID === "Reference")
+                    	fileIDstr = 'R'
             }
             cell[3].innerHTML = "<div class='rateSlider' id='slider"+fileID+"' rel='"+relID+"'>"+fileIDstr+"</div>";
 
