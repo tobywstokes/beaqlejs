@@ -101,19 +101,27 @@
     
     // play audio with specified ID
     AudioPool.prototype.play = function(ID){
+    AudioPool.prototype.play = function(ID,time){
         var audiotag = $('#'+this.PoolID+' > #audio'+ID).get(0);
         
         audiotag.currentTime = this.ABPos[0] / 100 * audiotag.duration;
                 
+        audiotag.currentTime = time;       
         audiotag.play();
     }
     
     // pause all audios
     AudioPool.prototype.pause = function() {
         var audioTags = document.body.getElementsByTagName("audio");    
+        var ct = 0;
         for (var i = 0; i<audioTags.length; i++) { 
             audioTags[i].pause();
+            if (audioTags[i].currentTime !=0){
+                 ct =  audioTags[i].currentTime;
+                 audioTags[i].currentTime = 0;
+            	 }
         }
+        return ct
     }
 
     // set volume of <audio> tags
@@ -450,6 +458,7 @@ function clientIsIE() {
     ListeningTest.prototype.playAudio = function (id) {
         
         this.audioPool.pause();
+        ct = this.audioPool.pause();
 
         // reset all buttons and sliders
         $('.rateSlider').parent().css('background-color', 'transparent');
@@ -460,6 +469,7 @@ function clientIsIE() {
         $(".playButton[rel="+id+"]").addClass('playButton-active');
         
         this.audioPool.play(id);
+        this.audioPool.play(id,ct);
     }
 
     // ###################################################################
