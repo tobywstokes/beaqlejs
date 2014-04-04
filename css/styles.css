@@ -13,7 +13,7 @@ body {
 #Wrapper {
     margin-left:auto;
     margin-right:auto;
-    width: 720px;
+    width: 840px;
 }
 
 .commonBox {
@@ -77,8 +77,8 @@ body {
 }
 
 .rateSlider {
-    width: 400px;
-    margin-left:15px;
+    height: 300px;
+    margin-left:20px;
     margin-right:15px;
 }
 
