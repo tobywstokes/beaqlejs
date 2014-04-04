@@ -702,6 +702,23 @@ MushraTest.prototype.createTestDOM = function (TestIdx) {
 
             this.addAudio(TestIdx, fileID, relID);
 
+            cell[j] = row[i].insertCell(-1);
+            cell[j].innerHTML = "<div class='rateSlider' id='slider"+fileID+"'rel='"+relID+"'position='"+j+"'>"+fileIDstr+"</div>";
+           }
+           }
+           if (i===3){
+            for (var j = 0; j < this.TestState.FileMappings[TestIdx].length; j++) { 
+            cell[j] = row[i].insertCell(-1);
+            cell[j].innerHTML =  "<div id='sliderval"+j+"'>0<\div>";
+           }
+           if (i === 4){
+            cell[1] = row[i].insertCell(-1);
+            cell[1].colSpan = 2;
+        	cell[1].innerHTML = '<button id="playReferenceBtn" class="playButton" rel="Reference" >Reference</button>';
+        	cell[2] = row[i].insertCell(-1);
+        	cell[2].innerHTML = '<button id="playReferenceBtn" class="playButton" rel="Mixture" >Mixture</button>';
+        	cell[2].colSpan = 2;
+ 			}
         }        
 
         // append the created table to the DOM
