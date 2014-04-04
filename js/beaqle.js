@@ -272,6 +272,20 @@ function clientIsIE() {
     // ###################################################################
     ListeningTest.prototype.nextTest = function() {
     	this.runTest(this.TestState.CurrentTest+1);
+     var advance = 0;
+     l = $(".rateSlider").length;
+     $(".rateSlider").each( function(i) {
+     pos = $(this).attr('position');
+     if(!$(this).hasClass('changed'))
+     	{
+     	alert("Please adjust all sliders before continuing")
+     	return false;
+     	}
+		if (i == l-1)
+	     	advance = 1;
+    });
+	     if (advance == 1)	
+	     	this.runTest(this.TestState.CurrentTest+1);		
     }
 
     // ###################################################################
@@ -345,6 +359,7 @@ function clientIsIE() {
                     max: TestData.RateMaxValue,
                     animate: false,
                     orientation: "horizontal"
+					$(this).addClass('changed')
             });
                     
             $(this).slider('option', 'value', 0);
