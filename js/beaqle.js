@@ -59,13 +59,12 @@
     // overwrite these callbacks events after instantiation
 
     // callback for time update event
-    AudioPool.prototype.onTimeUpdate = function(e) {}    
-    
+    AudioPool.prototype.onTimeUpdate = function(e) {}  
     // callback for error event
     AudioPool.prototype.onError = function(e) {}
     
     // callback for error event
-    AudioPool.prototype.onDataLoaded = function(e) {}
+    AudioPool.prototype.onDataLoaded = function(e){}
     // ---------------------------------------------------------
 
 
@@ -76,7 +75,6 @@
     
     // add new file to pool
     AudioPool.prototype.addAudio = function(path, ID){
-    
         if (this.NumPlayers<=this.NumUsed) {
             $('<audio id="" src="" preload="auto" class="audiotags"></audio>').appendTo('#'+this.PoolID); 
             this.NumPlayers++;
@@ -100,12 +98,8 @@
     }
     
     // play audio with specified ID
-    AudioPool.prototype.play = function(ID){
     AudioPool.prototype.play = function(ID,time){
         var audiotag = $('#'+this.PoolID+' > #audio'+ID).get(0);
-        
-        audiotag.currentTime = this.ABPos[0] / 100 * audiotag.duration;
-                
         audiotag.currentTime = time;       
         audiotag.play();
     }
@@ -127,7 +121,6 @@
     // set volume of <audio> tags
     AudioPool.prototype.setVolume = function(vol) {
         var vol = $('#VolumeSlider').slider('option', 'value') / 100;
-        
         var audioTags = $('#'+this.PoolID+' > audio');    
         for (var i = 0; i<audioTags.length; i++) { 
             audioTags[i].volume = vol;
@@ -170,7 +163,6 @@ function clientIsIE() {
     // ###################################################################
     // constructor and initialization
     var ListeningTest = function (TestData) {
-
         if (arguments.length == 0) return;
 
         // check if config file is valid
@@ -271,7 +263,6 @@ function clientIsIE() {
 
     // ###################################################################
     ListeningTest.prototype.nextTest = function() {
-    	this.runTest(this.TestState.CurrentTest+1);
      var advance = 0;
      l = $(".rateSlider").length;
      $(".rateSlider").each( function(i) {
@@ -301,7 +292,6 @@ function clientIsIE() {
     // ###################################################################    
     // prepares display to run test with number TestIdx
     ListeningTest.prototype.runTest = function(TestIdx) {
-
         this.pauseAllAudios();
 
         // save ratings from last test if available
@@ -347,7 +337,6 @@ function clientIsIE() {
         $('#TableContainer').hide();
         $('#PlayerControls').hide();
         $('#LoadOverlay').show();
-                
         // set some state variables
         this.TestState.CurrentTest = TestIdx;
         this.TestState.TestIsRunning = 1;
@@ -358,7 +347,6 @@ function clientIsIE() {
                     min: TestData.RateMinValue,
                     max: TestData.RateMaxValue,
                     animate: false,
-                    orientation: "horizontal"
                     orientation: "vertical",
                     disabled: true,
                     slide: function( event, ui){
@@ -385,7 +373,8 @@ function clientIsIE() {
             var audioID = $(this).attr('rel');
             $(this).on('click', $.proxy(function(event) {handlerObject.playAudio(audioID)}, handlerObject));
         });
-            
+       
+    
         // load and apply already existing ratings
         if (typeof this.TestState.Ratings[TestIdx] !== 'undefined') this.readRatings(TestIdx);
             
@@ -444,7 +433,6 @@ function clientIsIE() {
     // ###################################################################
     // audio loading error callback
     ListeningTest.prototype.audioErrorCallback = function(e) {
-
         var s = parseInt(e.target.currentTime % 60);
 
         var errorTxt = "<p>ERROR loading audio file "+ e.target.src+"</p>";
@@ -455,7 +443,6 @@ function clientIsIE() {
     // ###################################################################
     // audio time update callback
     ListeningTest.prototype.audioTimeCallback = function(e) {
-
         var s = parseInt(e.target.currentTime % 60);
         var m = parseInt((e.target.currentTime / 60) % 60);
         
@@ -479,9 +466,8 @@ function clientIsIE() {
     // ###################################################################
     //play audio with specified html ID
     ListeningTest.prototype.playAudio = function (id) {
-        
-        this.audioPool.pause();
         ct = this.audioPool.pause();
+
 
         // reset all buttons and sliders
         $('.rateSlider').parent().css('background-color', 'transparent');
@@ -493,7 +479,6 @@ function clientIsIE() {
         $(".rateSlider[rel="+id+"]").slider( "option", "disabled", false );
         $(".playButton[rel="+id+"]").addClass('playButton-active');
         
-        this.audioPool.play(id);
         this.audioPool.play(id,ct);
     }
 
@@ -562,7 +547,7 @@ MushraTest.prototype.constructor = MushraTest;
 // ###################################################################
 // create random mapping to test files
 MushraTest.prototype.createFileMapping = function (TestIdx) {
-    var NumFiles = $.map(this.TestData.Testsets[TestIdx].Files, function(n, i) { return i; }).length;
+    var NumFiles = $.map(this.TestData.Testsets[TestIdx].Files, function(n, i) { return i;}).length;
     var fileMapping = new Array(NumFiles);    
 
     $.each(this.TestData.Testsets[TestIdx].Files, function(index, value) { 
@@ -582,7 +567,6 @@ MushraTest.prototype.createFileMapping = function (TestIdx) {
 // ###################################################################
 // read ratings from TestState object
 MushraTest.prototype.readRatings = function (TestIdx) {
-    
     if ((TestIdx in this.TestState.Ratings)==false) return false;
     
     var testObject = this;
@@ -611,7 +595,6 @@ MushraTest.prototype.saveRatings = function (TestIdx) {
 
 
 MushraTest.prototype.createTestDOM = function (TestIdx) {
-
         // clear old test table
         if ($('#TableContainer > table')) {
             $('#TableContainer > table').remove();
@@ -630,23 +613,7 @@ MushraTest.prototype.createTestDOM = function (TestIdx) {
         var row = new Array();
         var cell = new Array();
             
-        // add reference
-        fileID = "Reference";
-        row  = tab.insertRow(-1);
-        cell[0] = row.insertCell(-1);
-        cell[0].innerHTML = "<span class='testItem'>Reference</span>";
-        cell[1] = row.insertCell(-1);
-        cell[1].innerHTML =  '<button id="play'+fileID+'Btn" class="playButton" rel="'+fileID+'">Play</button>';
-        cell[2] = row.insertCell(-1);
-        cell[2].innerHTML = "<button class='stopButton'>Stop</button>";  	
-        cell[3] = row.insertCell(-1);
-        cell[3].innerHTML = "<img id='ScaleImage' src='"+TestData.RateScalePng+"'/>";  	
-        
-        this.addAudio(TestIdx, fileID, fileID);
-            
-        // add spacing
         row = tab.insertRow(-1);
-        row.setAttribute("height","5"); 
         row.setAttribute("height","50"); 
 
         var rateMin = this.TestData.RateMinValue;
@@ -654,10 +621,6 @@ MushraTest.prototype.createTestDOM = function (TestIdx) {
             
         // add test items
         for (var i = 0; i < this.TestState.FileMappings[TestIdx].length; i++) { 
-            
-            var fileID = this.TestState.FileMappings[TestIdx][i];
-            if (fileID === "Reference")
-                relID = "HiddenRef";
             row[i]  = tab.insertRow(-1);           
             if(i===0){
             cell = row[i].insertCell(-1)
@@ -667,8 +630,12 @@ MushraTest.prototype.createTestDOM = function (TestIdx) {
             if(i===1){ 
             for (var j = 0; j < this.TestState.FileMappings[TestIdx].length; j++){ 
             var fileID;
+            fileID = this.TestState.FileMappings[TestIdx][j];
              if (fileID === "Reference")
+                 relID = "HiddenRef";
+             else
              	relID = fileID;
+            cell[j] = row[i].insertCell(-1);
             cell[j].innerHTML = '<button id="play'+relID+'Btn" class="playButton" rel="'+relID+'">'+(j+1)+'</button>';
             this.addAudio(TestIdx, fileID, relID);
             }
@@ -679,18 +646,6 @@ MushraTest.prototype.createTestDOM = function (TestIdx) {
              if (fileID === "Reference")
                  relID = "HiddenRef";
             else
-                relID = fileID;
-
-            row[i]  = tab.insertRow(-1);
-            cell[0] = row[i].insertCell(-1);
-            cell[0].innerHTML = "<span class='testItem'>Test Item "+ (i+1)+"</span>";
-            cell[1] = row[i].insertCell(-1);
-            cell[1].innerHTML =  '<button id="play'+relID+'Btn" class="playButton" rel="'+relID+'">Play</button>';
-            cell[2] = row[i].insertCell(-1);
-            cell[2].innerHTML = "<button class='stopButton'>Stop</button>";  
-            cell[3] = row[i].insertCell(-1);
-            var fileIDstr = "";
-            if (this.TestData.ShowFileIDs) {
                  relID = fileID;
         	var fileIDstr = "";
                 if (this.TestData.ShowFileIDs) {
@@ -698,10 +653,6 @@ MushraTest.prototype.createTestDOM = function (TestIdx) {
                     if (fileID === "Reference")
                     	fileIDstr = 'R'
             }
-            cell[3].innerHTML = "<div class='rateSlider' id='slider"+fileID+"' rel='"+relID+"'>"+fileIDstr+"</div>";
-
-            this.addAudio(TestIdx, fileID, relID);
-
             cell[j] = row[i].insertCell(-1);
             cell[j].innerHTML = "<div class='rateSlider' id='slider"+fileID+"'rel='"+relID+"'position='"+j+"'>"+fileIDstr+"</div>";
            }
@@ -710,6 +661,7 @@ MushraTest.prototype.createTestDOM = function (TestIdx) {
             for (var j = 0; j < this.TestState.FileMappings[TestIdx].length; j++) { 
             cell[j] = row[i].insertCell(-1);
             cell[j].innerHTML =  "<div id='sliderval"+j+"'>0<\div>";
+           }
            }
            if (i === 4){
             cell[1] = row[i].insertCell(-1);
@@ -723,11 +675,9 @@ MushraTest.prototype.createTestDOM = function (TestIdx) {
 
         // append the created table to the DOM
         $('#TableContainer').append(tab);	
-
 }
 
 MushraTest.prototype.formatResults = function () {
-
     var resultstring = "";
 
 
