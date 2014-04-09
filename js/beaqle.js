@@ -301,7 +301,7 @@ function clientIsIE() {
 
     // ###################################################################    
     // prepares display to run test with number TestIdx
-    ListeningTest.prototype.runTest = function(TestIdx) {
+    	ListeningTest.prototype.runTest = function(TestIdx) {
         this.pauseAllAudios();
 
         // save ratings from last test if available
@@ -505,38 +505,42 @@ function clientIsIE() {
             
         var UserName = $('#UserName').val();
         
+        var testHandle = this;
+        var EvalResultsJSON = JSON.stringify(testHandle.TestState.EvalResults);
+
         $.ajax({
                     type: "POST",
-                    url: TestData.SubmitResultsURL,
-                    data: {testresults:Results2Text(), testresultscsv:Results2CSV(), username:UserName},
+                    url: testHandle.TestData.SubmitResultsURL,
+                    data: {'testresults':EvalResultsJSON, 'username':UserName},
                     dataType: 'json'})
             .done( function (response){
                     if (response.error==false) {
-                        $('#SubmitBox').html("Your submission was succesful.<br/><br/>");
+                        $('#SubmitBox').html("Your submission was successful.<br/><br/>");
 
-                        $("#ResultsBox").show();
+                        //$("#ResultsBox").show();
                         $('#SubmitData').button('option',{ icons: { primary: 'ui-icon-check' }});
-                        TestState.TestIsRunning = 0;
+                        testHandle.TestState.TestIsRunning = 0;
                     } else {
                         $('#SubmitBox').html("span class='error'The following error occured during your submission:<br/>"
                                                 +response.message+
                                                 "<br/><br/> Please copy/paste the following table content and send it to our email adress "
-                                                +TestData.SupervisorContact+"<br/><br/> Sorry for any inconvenience!</span><br/><br/>"); 
+                                                +testHandle.TestData.SupervisorContact+"<br/><br/> Sorry for any inconvenience!</span><br/><br/>"); 
                         $("#ResultsBox").show();   
                         $('#SubmitData').button('option',{ icons: { primary: 'ui-icon-alert' }});
                     }
                 })
             .fail (function (xhr, ajaxOptions, thrownError){
                     $('#SubmitBox').html("<span class='error'>The following error occured during your submission:<br/>"
-                                            +ajaxOptions+
+                                            +xhr.status+
                                             "<br/><br/> Please copy/paste the following table content and send it to our email adress "
-                                            +TestData.SupervisorContact+"<br/><br/> Sorry for any inconvenience!</span><br/><br/>");
+                                            +testHandle.TestData.SupervisorContact+"<br/><br/> Sorry for any inconvenience!</span><br/><br/>");
                     $("#ResultsBox").show();   
                     $('#SubmitData').button('option',{ icons: { primary: 'ui-icon-alert' }});
                 });
         $('#SubmitData').button('option',{ icons: { primary: 'load-indicator' }});
 
     }
+
 
 
 
@@ -630,7 +634,6 @@ MushraTest.prototype.createTestDOM = function (TestIdx) {
         var rateMax = this.TestData.RateMaxValue;
             
         // add test items
-        for (var i = 0; i < this.TestState.FileMappings[TestIdx].length; i++) { 
         for (var i = 0; i < 5; i++) { 
             row[i]  = tab.insertRow(-1);           
             if(i===0){
@@ -716,14 +719,20 @@ MushraTest.prototype.formatResults = function () {
         cell = row.insertCell(-1);
         cell.innerHTML = "Rating";
 
-        var fileArr = this.TestData.Testsets[i].Files;
+       this.TestState.EvalResults[i]           = new Object();
+        this.TestState.EvalResults[i].rating    = new Object();
+        this.TestState.EvalResults[i].filename  = new Object();
+        var fileArr    = this.TestData.Testsets[i].Files;
+       var testResult = this.TestState.EvalResults[i];
 
         $.each(this.TestState.Ratings[i], function(fileID, rating) { 
             row  = tab.insertRow(-1);
             cell = row.insertCell(-1);
             cell.innerHTML = fileArr[fileID];
             cell = row.insertCell(-1);
-            cell.innerHTML = rating;
+            cell.innerHTML = rating;            
+           testResult.rating[fileID]   = rating;
+		   testResult.filename[fileID] = fileArr[fileID];
         });
         resultstring += tab.outerHTML + "\n";
     }
