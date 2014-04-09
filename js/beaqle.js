@@ -631,6 +631,7 @@ MushraTest.prototype.createTestDOM = function (TestIdx) {
             
         // add test items
         for (var i = 0; i < this.TestState.FileMappings[TestIdx].length; i++) { 
+        for (var i = 0; i < 5; i++) { 
             row[i]  = tab.insertRow(-1);           
             if(i===0){
             cell = row[i].insertCell(-1)
@@ -681,8 +682,10 @@ MushraTest.prototype.createTestDOM = function (TestIdx) {
             cell[1] = row[i].insertCell(-1);
             cell[1].colSpan = 2;
         	cell[1].innerHTML = '<button id="playReferenceBtn" class="playButton" rel="Reference" >Reference</button>';
+        	this.addAudio(TestIdx, 'Reference', 'Reference');
         	cell[2] = row[i].insertCell(-1);
         	cell[2].innerHTML = '<button id="playReferenceBtn" class="playButton" rel="Mixture" >Mixture</button>';
+        	this.addAudio(TestIdx, 'Mixture', 'Mixture');
         	cell[2].colSpan = 2;
  			}
         }        
