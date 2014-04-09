@@ -181,6 +181,12 @@ function clientIsIE() {
         }
         
         this.TestData = TestData;
+        if (this.TestData.RepeatRatings){
+        	testsets = shuffle(this.TestData.Testsets)
+        	this.TestData.Testsets = testsets.concat(testsets);
+        	}
+        else
+        	this.TestData.Testsets = shuffle(this.TestData.Testsets)
 
         // some state variables
         this.TestState = {
