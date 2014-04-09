@@ -643,6 +643,8 @@ MushraTest.prototype.createTestDOM = function (TestIdx) {
             fileID = this.TestState.FileMappings[TestIdx][j];
              if (fileID === "Reference")
                  relID = "HiddenRef";
+             else if (fileID === "Mixture")
+            	relID = "HiddenMix";
              else
              	relID = fileID;
             cell[j] = row[i].insertCell(-1);
@@ -655,6 +657,8 @@ MushraTest.prototype.createTestDOM = function (TestIdx) {
             var fileID = this.TestState.FileMappings[TestIdx][j];
              if (fileID === "Reference")
                  relID = "HiddenRef";
+            else if (fileID === "Mixture")
+            	relID = "HiddenMix";
             else
                  relID = fileID;
         	var fileIDstr = "";
