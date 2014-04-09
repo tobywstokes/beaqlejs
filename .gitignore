@@ -1,10 +1,12 @@
 *~
-audio/
+*audio/
 audio/*
 
 dummypage.html
 
 INRIA_config.js
+
+*config.js
 
 *.wav
 
@@ -15,3 +17,5 @@ PEASSAudio/PEASS-subjdata.mat
 PEASSAudio/license.txt
 
 PEASSAudio/readme.txt
+
+web_service/results/*

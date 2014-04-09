@@ -140,6 +140,10 @@
 
 // ###################################################################
 // some helper functions
+function shuffle(o){ 
+    for(var j, x, i = o.length; i; j = Math.floor(Math.random() * i), x = o[--i], o[i] = o[j], o[j] = x);
+    return o;
+}
 
 // logarithm to base 10
 function log10(val) {
