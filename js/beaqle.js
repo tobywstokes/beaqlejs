@@ -185,9 +185,9 @@ function clientIsIE() {
         	testsets = shuffle(this.TestData.Testsets)
         	this.TestData.Testsets = testsets.concat(testsets);
         	}
-        else
+        else{
         	this.TestData.Testsets = shuffle(this.TestData.Testsets)
-
+			}
         // some state variables
         this.TestState = {
             "CurrentTest": -1, 		// the current test index
@@ -282,12 +282,14 @@ function clientIsIE() {
      	alert("Please adjust all sliders before continuing")
      	return false;
      	}
-		if (i == l-1)
+	if (i == l-1)
 	     	advance = 1;
-    });
+   		 });
 	     if (advance == 1)	
 	     	this.runTest(this.TestState.CurrentTest+1);		
-    }
+    	if(l==0)
+    		this.runTest(0);	
+    	}
 
     // ###################################################################
     ListeningTest.prototype.prevTest = function() {
@@ -296,8 +298,12 @@ function clientIsIE() {
 
     // ###################################################################
     ListeningTest.prototype.startTests = function() {
-    	this.runTest(0);
+    	//if(this.TestData.Familiarisation)
+    		//console.log('Need to load a familiarisation screen')
+    		//this.createFamiliarisationDOM()
+    	this.runTest(-1);
     }
+    // 
 
     // ###################################################################    
     // prepares display to run test with number TestIdx
@@ -307,11 +313,12 @@ function clientIsIE() {
         // save ratings from last test if available
         if (this.TestState.CurrentTest>=0) this.saveRatings(this.TestState.CurrentTest);
         
-        if (TestIdx<0) TestIdx=0;
+        //if (TestIdx<0) TestIdx=0;
 
         // if previous test was last one, ask before loading final page and then exit test
         if (TestIdx >= this.TestData.Testsets.length) {
-            if (confirm('This was the last test. Do you want to finish?')) {
+            //if (confirm('This was the last test. Do you want to finish?')) 
+            {
             
                 $('#TableContainer').hide();
                 $('#PlayerControls').hide();
@@ -333,13 +340,18 @@ function clientIsIE() {
             return;
         }
         this.audioPool.clear();            
-        
-        this.createTestDOM(TestIdx);
- 
-
-        // set current test name
+        if(this.TestData.Familiarisation && TestIdx == -1){
+        	this.createFamiliarisationDOM();
+        	 $('#TestHeading').html("Familiarisation");
+        $('#TestHeading').show();
+        	}
+        else{
+        	this.createTestDOM(TestIdx);
+        	// set current test name
         $('#TestHeading').html(TestData.Testsets[TestIdx].Name + " (" + (TestIdx+1) + " of " + TestData.Testsets.length + ")");
         $('#TestHeading').show();
+        	}
+ 
 
         // hide everything instead of load animation
         $('#TestIntroduction').hide();
@@ -427,6 +439,53 @@ function clientIsIE() {
     }
 
     // ###################################################################
+	// create DOM for Familiarisation display
+    ListeningTest.prototype.createFamiliarisationDOM = function () {
+        // clear old test table
+        if ($('#TableContainer > table')) {
+            $('#TableContainer > table').remove();
+        }
+		
+        var tab = document.createElement('table');
+        tab.setAttribute('id','TestTable');
+            
+        var fileID = "";
+        var row = new Array();
+        var cell = new Array();
+            
+        row = tab.insertRow(-1);
+        row.setAttribute("height","50"); 
+		cell = row.insertCell(-1);
+        cell.colSpan = Object.keys(this.TestData.Testsets[1].Files).length;
+    	cell.innerHTML = 'Please familiarise yourself with the test audio';
+        if (this.TestData.RepeatRatings){
+        	var nrows = this.TestData.Testsets.length/2;
+            }
+    	else{
+        	var nrows = this.TestData.Testsets.length;
+        }
+        for(var i = 0; i <= nrows-1; i++){
+        row[i] = tab.insertRow(-1);
+        if (!this.TestState.FileMappings[i]) {
+        	this.createFileMapping(i);
+        }
+
+        cell[1] = row[i].insertCell(-1);
+        cell[1].innerHTML = TestData.Testsets[i].Name;
+            for (var j = 0; j < this.TestState.FileMappings[i].length; j++){ 
+            var fileID;
+            fileID = this.TestState.FileMappings[i][j];
+            relID = this.TestState.FileMappings[i].length*i+j;
+            cell[j] = row[i].insertCell(-1);
+            cell[j].innerHTML = '<button id="play'+relID+'Btn" class="playButton" rel="'+relID+'">'+(j+1)+'</button>';
+            this.addAudio(i, fileID, relID);
+            }
+            }
+     // append the created table to the DOM
+        $('#TableContainer').append(tab);
+        
+}
+    // ###################################################################
     // is called whenever an <audio> tag fires the onDataLoaded event
     ListeningTest.prototype.audioLoadedCallback = function () {
         this.TestState.AudiosInLoadQueue--;
@@ -435,7 +494,7 @@ function clientIsIE() {
         if (this.TestState.AudiosInLoadQueue==0) {
             $('#TestControls').show();
             $('#TableContainer').show();
-            $('#PlayerControls').show();       
+            //$('#PlayerControls').show();       
             $('#LoadOverlay').hide();
         }
     }
@@ -521,7 +580,7 @@ function clientIsIE() {
                         $('#SubmitData').button('option',{ icons: { primary: 'ui-icon-check' }});
                         testHandle.TestState.TestIsRunning = 0;
                     } else {
-                        $('#SubmitBox').html("span class='error'The following error occured during your submission:<br/>"
+                        $('#SubmitBox').html("<span class='error'>The following error occured during your submission:<br/>"
                                                 +response.message+
                                                 "<br/><br/> Please copy/paste the following table content and send it to our email adress "
                                                 +testHandle.TestData.SupervisorContact+"<br/><br/> Sorry for any inconvenience!</span><br/><br/>"); 
@@ -563,9 +622,8 @@ MushraTest.prototype.constructor = MushraTest;
 MushraTest.prototype.createFileMapping = function (TestIdx) {
     var NumFiles = $.map(this.TestData.Testsets[TestIdx].Files, function(n, i) { return i;}).length;
     var fileMapping = new Array(NumFiles);    
-
+	console.log(this.TestData.Testsets[TestIdx].Files);
     $.each(this.TestData.Testsets[TestIdx].Files, function(index, value) { 
-
         do {
             var RandFileNumber = Math.floor(Math.random()*(NumFiles));
             if (RandFileNumber>NumFiles-1) RandFileNumber = NumFiles-1;
@@ -574,8 +632,13 @@ MushraTest.prototype.createFileMapping = function (TestIdx) {
         if (RandFileNumber<0) alert(fileMapping);
         fileMapping[RandFileNumber] = index;
     });
-    
+    if (!this.TestData.IncludeHiddenMixture){
+    	console.log(fileMapping)
+        mixidx = fileMapping.indexOf('Mixture');
+    	fileMapping.splice(mixidx,1)
+    	console.log(fileMapping)}
     this.TestState.FileMappings[TestIdx] = fileMapping;
+    console.log(this.TestState.FileMappings[TestIdx]);
 }
 
 // ###################################################################
@@ -639,9 +702,16 @@ MushraTest.prototype.createTestDOM = function (TestIdx) {
             if(i===0){
             cell = row[i].insertCell(-1)
             cell.colSpan = this.TestState.FileMappings[TestIdx].length;
-            cell.innerHTML = 'Please rate each separated audio clip for overall quality';
+            cell.innerHTML = 'Please rate each separated audio clip for <b>overall quality</b>.<br> Each slider will only move when its audio is playing';
             }
-            if(i===1){ 
+            if (i === 1){
+            cell[1] = row[i].insertCell(-1);
+            cell[1].colSpan = this.TestState.FileMappings[TestIdx].length;
+        	cell[1].innerHTML = '<button id="playReferenceBtn" class="playButton" rel="Reference" style="width:100%">Reference</button>';
+        	this.addAudio(TestIdx, 'Reference', 'Reference');
+        	
+ 			}
+            if(i===2){ 
             for (var j = 0; j < this.TestState.FileMappings[TestIdx].length; j++){ 
             var fileID;
             fileID = this.TestState.FileMappings[TestIdx][j];
@@ -656,7 +726,7 @@ MushraTest.prototype.createTestDOM = function (TestIdx) {
             this.addAudio(TestIdx, fileID, relID);
             }
             }
-            if (i===2){
+            if (i===3){
             for (var j = 0; j < this.TestState.FileMappings[TestIdx].length; j++) { 
             var fileID = this.TestState.FileMappings[TestIdx][j];
              if (fileID === "Reference")
@@ -675,22 +745,13 @@ MushraTest.prototype.createTestDOM = function (TestIdx) {
             cell[j].innerHTML = "<div class='rateSlider' id='slider"+fileID+"'rel='"+relID+"'position='"+j+"'>"+fileIDstr+"</div>";
            }
            }
-           if (i===3){
+           if (i===4){
             for (var j = 0; j < this.TestState.FileMappings[TestIdx].length; j++) { 
             cell[j] = row[i].insertCell(-1);
-            cell[j].innerHTML =  "<div id='sliderval"+j+"'>0<\div>";
+            cell[j].innerHTML =  "<div class='sliderval' id='sliderval"+j+"'>0<\div>";
            }
            }
-           if (i === 4){
-            cell[1] = row[i].insertCell(-1);
-            cell[1].colSpan = 2;
-        	cell[1].innerHTML = '<button id="playReferenceBtn" class="playButton" rel="Reference" >Reference</button>';
-        	this.addAudio(TestIdx, 'Reference', 'Reference');
-        	cell[2] = row[i].insertCell(-1);
-        	cell[2].innerHTML = '<button id="playReferenceBtn" class="playButton" rel="Mixture" >Mixture</button>';
-        	this.addAudio(TestIdx, 'Mixture', 'Mixture');
-        	cell[2].colSpan = 2;
- 			}
+           
         }        
 
         // append the created table to the DOM

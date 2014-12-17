@@ -64,11 +64,14 @@ body {
 }
 
 #TestTable {
-    border-spacing:10px
+    /*border-spacing:10px*/
+	margin-left:auto; 
+    margin-right:auto;
 }
 
 #TestTable  td {
-    background-color: transparent;	
+    background-color: transparent;
+    padding: 5px;
 }
 
 #ScaleImage {
@@ -78,8 +81,22 @@ body {
 
 .rateSlider {
     height: 300px;
-    margin-left:20px;
-    margin-right:15px;
+    margin-left:auto;
+    margin-right:auto;
+    border-width: 1px;
+    border-style: solid;
+    border-color: #000000;
+    padding-top:25px;
+    padding-bottom:30px;
+}
+
+.ui-slider .ui-slider-handle {
+border-color: #000000;
+}
+
+.sliderval{
+    padding-top:5px;
+    padding-bottom:5px;
 }
 
 .activeAudioCell {
@@ -111,7 +128,10 @@ body {
 }
 
 #BtnNextTest {
+    position: relative;
     float: right;
+    //bottom:  -100;
+    width: 10em;  height: 2em;
 }
 
 #Volume{
@@ -154,11 +174,13 @@ body {
 
 .playButton{
     font-size:80%;
+    
 }
 
 .playButton-active{
     font-size:80%;
     background: #D5E5F6;
+    border-bottom: 80px;
 }
 
 .stopButton{
